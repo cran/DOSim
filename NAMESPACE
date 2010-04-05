@@ -1,0 +1,17 @@
+useDynLib(DOSim,OAWrapper)
+export(getOffsprings,
+		getAncestors,
+		getParents,
+		getChildren,
+		filterDO,
+		getGeneSim,
+		getDoAnno,
+		getDOGraph,
+		getDoTerm,
+		getMinimumSubsumer,
+		getDisjCommAnc,
+		getTermSim,
+		DOEnrichment,
+		getGIC,
+		getShortestPath,
+		plotCluster)

@@ -1,0 +1,359 @@
+%
+% NOTE -- ONLY EDIT DOSim.Rnw!!!
+% DOSim.tex file will get overwritten.
+%
+%\VignetteIndexEntry{DOSim Overview}
+%\VignetteKeywords{DOSim}
+%\VignettePackage{DOSim}
+%\VignetteDepends{RBGL}
+
+\documentclass[12pt]{article}
+
+\usepackage{Sweave}
+
+\author{Jiang Li}
+
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+
+\newcommand\Rpackage[1]{{\textsf{#1}\index{#1 (package)}}}
+\newcommand\RpackageNoindex[1]{{\textsf{#1}}}
+\newcommand\Rclass[1]{{\textit{#1}\index{#1 (class)}}}
+\newcommand\Rfunction[1]{{{\small\texttt{#1}}\index{#1 (function)}}}
+\newcommand\Rmethod[1]{{\small\texttt{#1}}}
+\newcommand\Rcommand[1]{{{\small\texttt{#1}}\index{#1 (function)}}}
+\newcommand\Rfunarg[1]{{\small\texttt{#1}}}
+\newcommand\Robject[1]{{\small\texttt{#1}}}
+
+\bibliographystyle{dosim}
+
+\begin{document}
+
+\title{How To Use DOSim}
+\maketitle
+\tableofcontents
+
+\section{Overview}
+This vignette demonstrates how to easily use the \Rpackage{DOSim} package. \Rpackage{DOSim} is used to calculate
+DO terms similarity and genes similarity based on terms similarity, and meanwhile it provides information for disease 
+ontology and can do DO Enrichment analysis.We take \Rpackage{GOSim}\cite{k00_GOSim} as a refernece to organize our code. 
+
+To start with \Rpackage{DOSim} package, type following code below.
+<<results=hide>>=
+library(DOSim)
+help(DOSim)
+@ 
+
+\section{Calculate DO Terms Similarity}
+	Terms in disease ontology(DO) are organized in Directed Acyclic Graph (DAG).Previous studies have developed
+many methods to calculate their similarities, information content(IC) based is the most popular one. In our package, we 
+provide 13 different methods to get DO terms similarity,including IC based and graph based. The function \textit{getTermSim}
+ is the interface for user to calculate DO terms similarity.
+ 
+
+An example of how to calculate DO Terms similarity is shown below:
+
+
+<<results=hide>>=
+termlist=c("DOID:399","DOID:1117","DOID:2313","DOID:2040")
+tsim<-getTermSim(termlist, method = "relevance", verbose = TRUE)
+@
+
+<<>>=
+tsim
+@
+
+Detailed information for each method implemented in \Rpackage{DOSim} is shown below.
+\subsection{Resnik}
+	Method \textsl{  Resnik }\cite{k01_Resnik} is IC based,the similarity between \textsl{term1} and \textsl{term2} is the maximum IC of 
+	their common ancestors. Defined as 
+$$
+IC(term1,term2)=\max_{t \in S(term1,term2)}\left[ IC(t) \right] =IC_{ms}
+$$
+where $S(term1,term2)$ is the set of terms that subsume both $term1$ and $term2$.
+
+\subsection{JiangConrath}
+
+In 1997, Jay J. Jiang and David W. Conrath\cite{k02_JiangConrath} proposed a new method and the formular is below:
+$$
+	IC(term1,term2)=1-\min(1,IC(term1)-2IC_{ms}+IC(term2))
+$$
+where $IC_{ms}$ is the similarity defiend by Resnik.
+\subsection{Lin}
+	The formula for Lin\cite{k03_Lin} is below:
+$$
+	IC(term1,term2)=\frac{2IC_{ms}}{IC(term1)+IC(term2)}
+$$
+where $IC_{ms}$ is the similarity defiend by Resnik.
+\subsection{CoutoEnriched}
+	These method is proposed by Couto in 2003\cite{k04_Couto},please see the original paper for detail.
+\subsection{CoutoResnik}
+	It is similar to \textsl{  Resnik },but instead of using common ancestor, the similarity of $term1$ and 
+	$term2$ is the maximun IC of all the commom \textbf{  disjunctive ancestors } of $term1$ and $term2$\cite{k05_Couto2}.
+	It is defined as:
+$$
+	IC(term1,term2)=\max_{t \in CommonDisjAnc(term1,term2)}\left[ IC(t) \right] =IC_{share}
+$$
+where $CommonDisjAnc(term1,term2)$ is the set of common disjunctive ancestors of $term1$ and $term2$.
+
+	  
+\subsection{CoutoJiangConrath}
+	Similar to JiangConrath,use the Couto's\cite{k05_Couto2} concept and defined as :
+$$
+	IC(term1,term2)=1-\min(1,IC(term1)-2IC_{share}+IC(term2))
+$$	
+where $IC_{share}$ is the similarity defiend by CoutoResnik.
+
+\subsection{CoutoLin}
+	Similar to Lin,use the Couto's\cite{k05_Couto2} concept and defined as :
+$$
+	IC(term1,term2)=\frac{2IC_{share}}{IC(term1)+IC(term2)}
+$$
+where $IC_{share}$ is the similarity defiend by CoutoResnik.
+
+\subsection{relevance}
+	
+	Proposed by Schlicker\cite{k06_Schlicker} in 2006.
+$$
+	IC(term1,term2)=Sim_{Lin}*(1-e^{ -IC_{ms} } )
+$$
+where $Sim_{Lin}$ is the similarity defined by $Lin$ and $IC_{ms}$ for Resnik.
+
+\subsection{GIC}
+	
+	Proposed by Pesquita\cite{k07_Pesquita} in 2007.
+$$
+	IC(term1,term2)=\frac{\sum\limits_{t \in(Ancestor(term1) \cap Ancestor(term2))}IC(t)}{\sum\limits_{t \in(Ancestor(term1) \cup Ancestor(term2))}IC(t)}
+$$
+where $Ancestor(t)$ is the set of all ancestor terms of term $t$
+
+
+\subsection{simIC}
+	Proposed by Li\cite{k08_Li} in 2009.
+$$
+	IC(term1,term2)=Sim_{Lin}*(1-\frac{1}{1+IC_{ms}})
+$$
+where $Sim_{Lin}$ is the similarity defined by $Lin$ and $IC_{ms}$ for Resnik.
+\subsection{path}
+	This method is not IC based and first proposed by Wu Z\cite{k09_Wu} in 1994 and mentiond in Pedersen's\cite{Pedersen2007288} article in 2007.
+$$
+	IC(term1,term2)=\frac{1}{p}
+$$
+where $p$ is the number of nodes on the shortest path between $term1$ and $term2$.
+\subsection{lch}
+	This method is also not IC based and first proposed by Leacock C\cite{k10_Leacock} in 1998 and  mentiond in Pedersen's\cite{Pedersen2007288} article in 2007.
+$$
+	IC(term1,term2)=-\log(\frac{p}{2*depth})
+$$
+where $p$ is the number of nodes on the shortest path between $term1$ and $term2$ and $depth$ is 
+the maximum depth of the hierarchy.
+
+\subsection{Wang}
+	Proposed by Wang\cite{k11_wang} in 2007 and see the original paper for detail.
+$$
+	Sim(term1,term2)=\frac{\sum\limits_{t\in T_{term1}\cap T_{term2}} (S_{term1}(t)+S_{term2}(t))}{SV(term1)+SV(term2)}
+$$
+where $S_{term1}(t)$ is the $S-value$ of term $t$ related to term $term1$. In DO, term $term1$ can be represented
+as $DAG_{term1}=(term1,T_{term1},E_{term1})$ where $T_{term1}$ is the set of DO terms in $DAG_{term1}$,including term
+$term1$ and all of its ancestor terms in the DO graph,and $E_{term1}$ is the set of edeges connecting the DO terms
+in $DAG_{term1}$.And for any term $t$ in $DAG_{term1}=(term1,T_{term1},E_{term1})$,its S-value is defined as:
+$$
+\left\{_{S_{term1}(t)=\max\{w_{e}*S_{term1}(t^{'})|t^{'} \in childrenof(t)\} \quad if \ t\neq A}^{S_{term1}(term1)=1}\right.
+$$
+where $w_{e}$ is the semantic contribution factor for edge $e \in E_{term1}$ linking term $t$ with its child term $t^{'}$.After
+obtaining the S-values for all terms in $DAG_{term1}$, we calculate the semantic value of DO term $term1$,$SV(term1)$,as:
+$$
+	SV(term1)=\sum\limits_{t\in T_{term1}}S_{term1}(t)
+$$
+
+\section{Calculate Genes Similarity}
+Genes similarity is calculate based on their annotated DO terms similarity.\Rpackage{DOSim} provides users a function named
+\textsl{getGeneSim} to calculate genes similarity.It provides 8 methods to calculate genes similarity.A basic example is shown
+below:
+<<results=hide>>=
+genelist<-c("10003","10008","10015","10042","10036")
+gsim<-getGeneSim(genelist,similarity="funSimMax",similarityTerm="Lin")
+@
+
+<<>>=
+gsim
+@
+
+Here we define some formula and detail information for each method is described below.
+Assume $gene1$ have $m$ DO annoated($DO_1=\{do_{11},do_{12},\dots,do_{1m}\}$) and $gene2$ have $n$ DO annotated($DO_2=\{do_{21},do_{22},\dots,do_{2n}\}$).
+We define $Sim_{matrix}$ is an $m\times n$ matrix of any pairwise DO terms similarity from $DO_1$ to $DO_2$.
+$$
+	Sim_{matrix}=
+\left\lbrace
+\begin{array}{clcr}
+	sim_{11} & sim_{12} & \cdots & sim_{1n} \\
+	sim_{21} & sim_{22} & \cdots & sim_{2n} \\
+	\multicolumn{4}{c}\dotfill \\
+	sim_{m1} & sim_{m2} & \cdots & sim_{mn}
+\end{array}
+\right\rbrace 
+$$
+\subsection{max}
+
+The maximum similarity between any two DO terms.
+$$
+	Sim(gene1,gene2)=\max(Sim_{matrix})
+$$
+
+\subsection{mean}
+The average similarity between any two DO terms
+$$
+	Sim(gene1,gene2)=mean(Sim_{matrix})
+$$
+\subsection{funSimMax}
+The average of best matching DO term similarities. 
+Take the maximum of the scores achieved by assignments of DO terms from gene 1 to gene 2 and vice versa.\cite{k12_Schlicker}
+$$
+	Sim(gene1,gene2)=\max(rowMax, colMax)
+$$
+where $rowMax$ is the average score of each row's maximum score, and same for $colMax$.
+
+\subsection{funSimAvg}
+The average of best matching DO term similarities. 
+Take the average of the scores achieved by assignments of DO terms from gene 1 to gene 2 and vice versa. \cite{k12_Schlicker}
+$$
+	Sim(gene1,gene2)=\frac{rowMax+colMax}{2}
+$$
+where $rowMax$ is the average score of each row's maximum score, and same for $colMax$.
+
+
+\subsection{OA}
+The optimal assignment (maximally weighted bipartite
+  matching) of DO terms associated to the gene having fewer annotation
+  to the DO terms of the other gene.\cite{k13_Froehlich}. See the original paper
+  for details.
+  
+\subsection{hausdorff}
+The translation of the Hausdorff distance between two sets:\cite{k14_Pozo}
+Let A and B be the two sets of DO terms associated to two genes($gene1$ and $gene2$). 
+Then
+$$
+	Sim(gene1,gene2)=\min
+	\left( 
+		\min
+			\left(
+				\max_{x \in A}
+					\left(
+						x,y
+					\right)
+			\right),
+		\min
+			\left(
+				\max_{y \in B}
+					\left(
+						x,y
+					\right)
+			\right)	
+	\right)
+$$
+
+\subsection{dot}
+The dot product between feature vectors describing the absence/presence of each DO term. 
+The absence of each DO term is weighted by its information content. 
+Depending on the type of later normalization one can arrive at the cosine similarity (method="sqrt")
+or at the Tanimoto coefficient (method="Tanimoto").\cite{k15_Mistry}.See the original paper
+  for details.
+
+
+
+\subsection{Wang}
+Propose by Wang in 2007.\cite{k11_wang}.
+Give two genes $gene1$ and $gene2$ annotated by DO term sets
+$DO_1=\{do_{11},do_{12},\dots,do_{1m}\}$ and $DO_2=\{do_{21},do_{22},\dots,do_{2n}\}$ respectively, we define their similarity as:
+$$
+	Sim(gene1,gene2)=\frac{\sum\limits_{1\le i \le m}Sim(do_{1i},DO_2)+\sum\limits_{1\le j \le n}Sim(do_{2j},DO_1)}{m+n}
+$$
+where $Sim(do_{1i},DO_2)=\max\limits_{do_j \in DO_2}(sim(do_{1i},do_j))$
+
+\section{Get Information of Disease Ontology}
+	The Disease Ontology is a community driven,open source ontology that is designed to
+link disparate datasets through disease concepts. Terms in DO are organized in Directed Acyclic Graph (DAG).
+With the work of John D.Osborne in 2009\cite{Osborne}, human genes are annotated to DO terms.In \Rpackage{DOSim}, we
+provide 7 functions to fetch information of DO terms. They are:
+\begin{itemize}
+\item	$getParents$
+\item	$getAncestors$
+\item	$getOffsprings$
+\item	$getChildren$
+\item	$getDoTerm$
+\item	$getDoAnno$
+\item	$getDOGraph$
+\end{itemize}
+Basic example of each of the 7 functions are show in the following sections below.
+\subsection{getParents}
+Returns a list of all direct parents associated to each DO term.
+<<>>=
+terms<-c("DOID:934","DOID:1579")
+getParents(terms)
+@
+
+\subsection{getAncestors}
+Returns the list of all ancestors associated to each DO term.
+<<>>=
+terms<-c("DOID:934","DOID:1579")
+getAncestors(terms)
+@
+
+\subsection{getOffsprings}
+Returns the list of all offspring associated to each DO term.
+<<>>=
+terms<-c("DOID:10533","DOID:550")
+getOffsprings(terms)
+@
+
+\subsection{getChildren}
+Returns the list of all direct children associated to each DO term.
+<<>>=
+terms<-c("DOID:934","DOID:1579")
+getChildren(terms)
+@
+\subsection{getDoTerm}
+Returns the list of DO term's name associated to each DO ID.
+<<>>=
+terms<-c("DOID:934","DOID:1579")
+getDoTerm(terms)
+@
+\subsection{getDoAnno}
+Get gene list associated to each DO term
+<<>>=
+terms<-c("DOID:934","DOID:1579")
+getDoAnno(terms)
+@
+
+\subsection{getDOGraph}
+Get DO graph with specified DO terms at its leave.
+<<fig=TRUE>>=
+terms<-c("DOID:934","DOID:1579")
+if(require(graph)){
+	g<-getDOGraph(terms)
+	if(require(Rgraphviz)){ 
+		plot(g)
+	}
+}
+@
+
+
+\section{DO Enrichment Analysis}
+\Rpackage{DOSim} can do DO enrichment analysis for a list of Entrez gene ids by using \textbf{hyper geometric test} 
+or \textbf{fisher test}.To do it, you can simply invoke the function $DOEnrichment$. Here is an example.
+<<>>=
+genelist=as.character(1:100)
+DOEnrichment(genelist,method = "hypertest",filter=50,cutoff=0.001)
+
+
+@
+  
+ 
+\bibliography{DOSim}
+\end{document}
