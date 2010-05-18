@@ -3,6 +3,7 @@ function(genelist, similarity="funSimMax", similarityTerm="relevance", normaliza
 	genelist <- unique(genelist)
 	if(length(genelist) < 2)
 		stop("Gene list should contain more than 2 elements!")
+		
 	allgenes<-filterDO(genelist)	
 	if(length(allgenes) > 1){
 		
@@ -29,14 +30,15 @@ function(genelist, similarity="funSimMax", similarityTerm="relevance", normaliza
 					Ker[j,i]<-Ker[i,j]
 				}
 			}
-		}			
+		}
+					
 		if(normalization){			
 			Ker = normalize.kernel(Ker, method)
 		}			
 	}
 	else{
 		if(length(allgenes) == 0)
-			stop("No gene has GO information!")					
+			stop("No gene has DO information!")					
 		else if(length(allgenes) == 1)
 			stop(paste("Only gene",allgenes," has DO information!"))					
 	}

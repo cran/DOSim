@@ -31,7 +31,7 @@ function(anno1, anno2, similarity="max", similarityTerm="JiangConrath", STerm=NU
 	if(similarity %in% c("dot"))
 		return(getWeightedDotSim(a1, a2))			
 	else{
-		# calculate term similarity
+		#   term similarity
 		ker<-matrix(0,nrow=length(a1),ncol=length(a2))	
 		for(i in 1:length(a1)){
 			for(j in 1:length(a2))

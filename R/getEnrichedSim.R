@@ -17,24 +17,26 @@ function(term1, term2){
 			path1=sp.between(G,term1,ms)[[1]]$path # path to ms                
 			len<-length(path1)
 			delta1<-sum(sapply(path1[2:len],getDepthFactor,G)*sapply(path1[2:len],getDensityFactor)*(-diff(IC[path1])))
-		}
-		else
+		}else{
 			delta1<-0
+		}
+    	
 		if(term2 != ms){
 			path2<-sp.between(G,term2,ms)[[1]]$path # path to ms    	
 			len<-length(path2)
 			delta2<-sum(sapply(path2[2:len],getDepthFactor,G)*sapply(path2[2:len],getDensityFactor)*(-diff(IC[path2])))
-		}
-		else
+		}else{
 			delta2<-0
+		}
+    	
 		delta<-delta1 + delta2		
 		sim<-1 - min(1, delta)
-	}
-	else
-		sim<-1 
+	}else{
+		sim<-1
+  } 
 	sim<-sim * IC[term1] * IC[term2]  # correction given in equation (11) of the FuSSiMeg paper
 	names(sim)<-c()
-	if(is.nan(sim) || sim == Inf){
+	if(is.na(sim) || sim == Inf){
 		sim=0
 	}   
 	sim

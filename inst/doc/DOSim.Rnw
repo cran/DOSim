@@ -40,247 +40,301 @@
 \tableofcontents
 
 \section{Overview}
-This vignette demonstrates how to easily use the \Rpackage{DOSim} package. \Rpackage{DOSim} is used to calculate
-DO terms similarity and genes similarity based on terms similarity, and meanwhile it provides information for disease 
-ontology and can do DO Enrichment analysis.We take \Rpackage{GOSim}\cite{k00_GOSim} as a refernece to organize our code. 
+This vignette demonstrates how to easily use the \Rpackage{DOSim} package. \Rpackage{DOSim} is used to calculate DO terms similarity and genes similarity based on terms similarity, and meanwhile it provides information for disease ontology and can do DO Enrichment analysis. We take \Rpackage{GOSim} \cite{k00_GOSim} as a refernece to organize our code. 
 
-To start with \Rpackage{DOSim} package, type following code below.
+To start with \Rpackage{DOSim} package, type following code below:
 <<results=hide>>=
 library(DOSim)
 help(DOSim)
 @ 
 
-\section{Calculate DO Terms Similarity}
-	Terms in disease ontology(DO) are organized in Directed Acyclic Graph (DAG).Previous studies have developed
-many methods to calculate their similarities, information content(IC) based is the most popular one. In our package, we 
-provide 13 different methods to get DO terms similarity,including IC based and graph based. The function \textit{getTermSim}
- is the interface for user to calculate DO terms similarity.
- 
+\section{Calculate DO Terms Similarity}Terms in disease ontology(DO) are organized in Directed Acyclic Graph (DAG). Previous studies have developed many methods to calculate their similarities. \Rpackage{DOSim} implements two types of approaches for calculation of similarity between terms in Disease Ontology: node-based, in which the main data sources are the nodes and their properties; and edge-based, which use the edges and their types as the data source. Totally thirteen different methods are implemented, ten out of thirteen are node-base and the left threes are edge-based. The function \textit{getTermSim} is the interface for user to calculate DO terms similarity. 
 
 An example of how to calculate DO Terms similarity is shown below:
-
-
 <<results=hide>>=
 termlist=c("DOID:399","DOID:1117","DOID:2313","DOID:2040")
 tsim<-getTermSim(termlist, method = "relevance", verbose = TRUE)
 @
-
 <<>>=
 tsim
 @
 
-Detailed information for each method implemented in \Rpackage{DOSim} is shown below.
+Detailed information for each method implemented in \Rpackage{DOSim} is shown below:
 \subsection{Resnik}
-	Method \textsl{  Resnik }\cite{k01_Resnik} is IC based,the similarity between \textsl{term1} and \textsl{term2} is the maximum IC of 
-	their common ancestors. Defined as 
-$$
-IC(term1,term2)=\max_{t \in S(term1,term2)}\left[ IC(t) \right] =IC_{ms}
-$$
-where $S(term1,term2)$ is the set of terms that subsume both $term1$ and $term2$.
+Resnik'measure is one of the most common semantic similarity measures, it was originally developed for the WordNet\cite{k01_Resnik}. Resnik measures similiarity between two terms as simply the IC of their most informative common ancestor (MICA), which is defined as follows:
+
+\begin{equation}\label{eq:resnik}
+Sim_{Resnik}\left(t_1,t_2\right)=IC\left(t_{MICA}\right)
+\end{equation}
 
 \subsection{JiangConrath}
+Jiang and Conrath developed measures that scale the information content of the MICA by the information content of the individual concepts \cite{k02_JiangConrath}. It is defined as:
+\begin{equation}\label{eq:jc}
+Sim_{JC}\left(t_1,t_2\right)=1-\min{\left(1,IC\left(t_1\right)+IC\left(t_2\right)-2\times IC\left(t_{MICA}\right)\right)}
+\end{equation}
 
-In 1997, Jay J. Jiang and David W. Conrath\cite{k02_JiangConrath} proposed a new method and the formular is below:
-$$
-	IC(term1,term2)=1-\min(1,IC(term1)-2IC_{ms}+IC(term2))
-$$
-where $IC_{ms}$ is the similarity defiend by Resnik.
+
 \subsection{Lin}
-	The formula for Lin\cite{k03_Lin} is below:
-$$
-	IC(term1,term2)=\frac{2IC_{ms}}{IC(term1)+IC(term2)}
-$$
-where $IC_{ms}$ is the similarity defiend by Resnik.
+Lin's measure is the extension of Resnik's by taking the distance of how distant the terms are from their common ancestor into account\cite{k03_Lin}. It is defined as:
+\begin{equation}\label{eq:lin}
+Sim_{Lin}\left(t_1,t_2\right)=\frac{2\times IC\left(t_{MICA}\right)}{IC\left(t_1\right)+IC\left(t_2\right)}
+\end{equation}
+
+
 \subsection{CoutoEnriched}
-	These method is proposed by Couto in 2003\cite{k04_Couto},please see the original paper for detail.
+This measure begin with the semantic distance (inverse of similarity) and is proposed by Couto in 2003 \cite{k04_Couto}. The semantic distance between $t_1$ and $t_2$ when $t_1$ subsumes $t_2$ is quantified as follows:
+\begin{equation}\label{eq:sim_dist}
+ \Delta\left(t_1,t_2\right)=IC\left(t_2\right)-IC\left(t_1\right)
+\end{equation}
+When two terms $t_2$ and $t_3$ without a subsuming relation, the semantic distance is the sum of their semantic distance to  their most informative common ancestor $t_1$. Thus, the semantic distance between term $t_2$ and $t_3$ is quantified as follows:
+\begin{equation}\label{eq:sim_dist2}
+ \Delta\left(t_2,t_3\right)= \Delta\left(t_1,t_2\right)+ \Delta\left(t_1,t_3\right)
+\end{equation}
+
+The distance defined in equations \ref{eq:sim_dist} and \ref{eq:sim_dist2} does not use any conceptual distance factors. Thus, we have to redefine this distance to integrate the node depth and density factors. Considering a term $t_0$ that subsumes $t_n$, and the sequence of terms $t_0,\dots,t_n$ representing the path from $t_0$ to $t_n$ with length $n$, the senmantic distance between $t_0$ and $t_n$ is redefeind as follows:
+\begin{equation}\label{eq:sim_dist3}
+ \Delta\left(t_0,t_n\right)=\sum_{i=0}^{n-1}D\left(t_i\right)\times E\left(ti\right) \times \left(IC\left(t_{\left(i+1\right)}\right)-IC\left(t_{i}\right)\right)
+\end{equation}
+where $D\left(t\right)$ and $E\left(t\right)$ represent the depth and density conceptual distance factors for a term $t$. 
+
+$D\left(t\right)$ is defined as follows:
+\begin{equation}\label{eq:dt}
+ D\left(t\right)=\left(\frac{d\left(t\right)+1}{d\left(t\right)}\right)^{\alpha}
+\end{equation}
+where $d\left(t\right)$ denotes the depth of term $t$ in the ontology. The $\alpha$ parameter controls the degree of how much the depth factor contributes in equation \ref{eq:sim_dist3}. When $\alpha$ approaches 0, this contribution becomes less significant, since $D\left(t\right)$ will apprach 1.
+
+$E\left(t\right)$ is defined as follows:
+\begin{equation}\label{eq:et}
+ E\left(t\right)=\left(1-\beta\right) \times \frac{\overline{E}}{e\left(t\right)} + \beta
+\end{equation}
+where $e\left(t\right)$ denotes the local density of the term $t$, i.e. the number of edges that start from $t$. $\overline{E}$ represents the average density in the whole ontology, i.e. the number of edges divided by the number of terms in the ontology. The $\beta$ parameter controls the degree of how much the density factor contributes in equation \ref{eq:sim_dist3}. When $\beta$ approaches 1, this contribution becomes less significant, since $E\left(t\right)$ will approach 1.
+
+By normalizing the distance defined in equataion \ref{eq:sim_dist3}, we finally get the semantic similarity between term $t_1$ and $t_2$ as follows:
+\begin{equation}\label{eq:enriched}
+ Sim_{CoutoEnriched}\left(t_1,t_2\right)=1-\min\left(1,\frac{\Delta\left(t_1,t_2\right)}{IC\left(t_0\right)}\right)
+\end{equation}
+where $IC\left(t_0\right)$ represents the maximum information content possible in the ontology.
+
+
 \subsection{CoutoResnik}
-	It is similar to \textsl{  Resnik },but instead of using common ancestor, the similarity of $term1$ and 
-	$term2$ is the maximun IC of all the commom \textbf{  disjunctive ancestors } of $term1$ and $term2$\cite{k05_Couto2}.
-	It is defined as:
-$$
-	IC(term1,term2)=\max_{t \in CommonDisjAnc(term1,term2)}\left[ IC(t) \right] =IC_{share}
-$$
-where $CommonDisjAnc(term1,term2)$ is the set of common disjunctive ancestors of $term1$ and $term2$.
+In 2005, Couto et.al \cite{k05_Couto2} proposed  the GraSM (Graph-based Similarity Measure) approach by introducing the concept of disjunctive common ancestor (DCA). For a term $t$, GraSM considers that $a_1$ and $a_2$ represent disjunctive ancestors of $t$ if there is a path from $a_1$ to $t$ not passing through $a_2$ and a path from $a_2$ to $t$ not passing through $a_1$, it is defiend as follows:
+\begin{equation}
+\begin{array}{lcr}
+DisjAnc\left(t\right) = \{\left(a_1,a_2\right)\mid  \nonumber\\
+&\\						
+\qquad\left(\exists p:\left(p \in Paths\left(a_1,t\right)\right) \land \left(a_2 \notin p\right)\right) \land \nonumber\\
+&\\
+\qquad\left( \exists p:\left(p \in Paths\left(a_2,t\right)\right) \land \left(a_1 \notin p\right)\right)\} 
+\end{array}
+\end{equation}
+Given two terms $t_1$ and $t_2$, their DCAs are the most informative common ancestor of disjunctive ancestors of $t_1$ and $t_2$ and is defiend as follows:
+\begin{equation}
+\begin{array}{lcr}
+DisjCommonAnc\left(t_1,t_2\right)=\{a_1 \mid \nonumber\\
+&\\
+\qquad a_1 \in CommonAnc\left(t_1,t_2\right) \land \\
+&\\
+\qquad \forall a_2 : \left[\left(a_2 \in CommonAnc\left(t_1,t_2\right)\right) \land \left(IC\left(a_1\right) \leq IC\left(a_2\right)\right)\right] \Rightarrow \\
+&\\
+\qquad \left[\left(a_1,a_2\right) \in \left(DisjAnc\left(t_1\right)\cup DisjAnc\left(t_2\right)\right)\right]\}
+\end{array}
+\end{equation}
+
+GraSM defines the shared information of two terms as the average of the imformation content of the DCAs compared with the inforamtion content of the MICA. 
+\begin{equation}
+ Share_{GraSM}\left(t_1,t_2\right) = \overline{\{IC\left(a\right) \mid a\in DisjCommonAnc\left(t_1,t_2\right)\}}
+\end{equation}
+It can overcome the constrains when only looking at the MICA and can capture more interpretations for both terms in a DAG ontolgy. Meanwhile it can be applied to any of the measures previously described (Resnik's, JiangConrath's and Lin's) by replacing the IC of the MICA with the average IC of all DCAs. Method named 'CoutoResnik' in DOSim is similar to Resnik's and it is defined as follows:
+\begin{equation}\label{eq:CoutoResnik}
+ Sim_{CoutoResnik}\left(t_1,t_2\right)=Share_{GraSM}\left(t_1,t_2\right)
+\end{equation}
 
 	  
 \subsection{CoutoJiangConrath}
-	Similar to JiangConrath,use the Couto's\cite{k05_Couto2} concept and defined as :
-$$
-	IC(term1,term2)=1-\min(1,IC(term1)-2IC_{share}+IC(term2))
-$$	
-where $IC_{share}$ is the similarity defiend by CoutoResnik.
+It is similar to JiangConrath's by replacing the IC of the MICA with the average IC of all DCAs and defined as follows:
+\begin{equation}\label{eq:CoutoJiangConrath}
+ Sim_{CoutoJC}\left(t_1,t_2\right)=1-\min{\left(1,IC\left(t_1\right)+IC\left(t_2\right)-2\times Share_{GraSM}\left(t_1,t_2\right) \right)}
+\end{equation}
 
 \subsection{CoutoLin}
-	Similar to Lin,use the Couto's\cite{k05_Couto2} concept and defined as :
-$$
-	IC(term1,term2)=\frac{2IC_{share}}{IC(term1)+IC(term2)}
-$$
-where $IC_{share}$ is the similarity defiend by CoutoResnik.
+It is similar to Lin's by replacing the IC of the MICA with the average IC of all DCAs and defined as follows:
+\begin{equation}\label{eq:CoutoLin}
+Sim_{CoutuLin}\left(t_1,t_2\right)=\frac{2\times Share_{GraSM}\left(t_1,t_2\right) }{IC\left(t_1\right)+IC\left(t_2\right)}
+\end{equation}
+
 
 \subsection{relevance}
-	
-	Proposed by Schlicker\cite{k06_Schlicker} in 2006.
-$$
-	IC(term1,term2)=Sim_{Lin}*(1-e^{ -IC_{ms} } )
-$$
-where $Sim_{Lin}$ is the similarity defined by $Lin$ and $IC_{ms}$ for Resnik.
+As Lin's measure is displaced from the graph \cite{k07_Pesquita}, Schlicker et al. \cite{k06_Schlicker} have proposed the relevance similarity measure, which is based on Lin's measure, but use the probalility of annotation of the MICA as a weighting factor to provide graph placement, which is defined as follows:
+\begin{equation}\label{eq:relevance}
+ Sim_{relevance}\left(t_1,t_2\right)=Sim_{Lin}\left(t_1,t_2\right) \times \left(1-p\left(t_{MICA}\right)\right)
+\end{equation} where $p\left(t_{MICA}\right)=e^{-IC\left(t_{MICA)}\right)}$ in DOSim package.
+
 
 \subsection{GIC}
+This method is proposed by Presquita et al.\cite{k07_Pesquita} and it is an expansion of graph-based similarity measures. GIC stands for 'Graph Information Content' and it is defined as follows:
+\begin{equation}\label{eq:gic}
+ Sim_{GIC}\left(t_1,t_2\right) = \frac{\sum\limits_{t \in \left(Ancestor\left(t_1\right) \cap Ancestor\left(t_2\right)\right)}IC\left(t\right)}{\sum\limits_{t \in \left(Ancestor\left(t_1\right) \cup Ancestor\left(t_2\right)\right)}IC\left(t\right)}
+\end{equation}
 	
-	Proposed by Pesquita\cite{k07_Pesquita} in 2007.
-$$
-	IC(term1,term2)=\frac{\sum\limits_{t \in(Ancestor(term1) \cap Ancestor(term2))}IC(t)}{\sum\limits_{t \in(Ancestor(term1) \cup Ancestor(term2))}IC(t)}
-$$
-where $Ancestor(t)$ is the set of all ancestor terms of term $t$
+
 
 
 \subsection{simIC}
-	Proposed by Li\cite{k08_Li} in 2009.
-$$
-	IC(term1,term2)=Sim_{Lin}*(1-\frac{1}{1+IC_{ms}})
-$$
-where $Sim_{Lin}$ is the similarity defined by $Lin$ and $IC_{ms}$ for Resnik.
+This similarity measure is quite like the relevance measure, it is called information coefficient similarity measure which effectively intergrates both the information content and the structural information of terms in a DAG ontolgy\cite{k08_Li}. It is defined as follows:
+\begin{equation}\label{eq:simic}
+ Sim_{simIC}\left(t_1,t_2\right) = Sim_{Lin} \times \left(1-\frac{1}{1+ IC\left(t_{MICA}\right)}\right)
+\end{equation}
+
+
 \subsection{path}
-	This method is not IC based and first proposed by Wu Z\cite{k09_Wu} in 1994 and mentiond in Pedersen's\cite{Pedersen2007288} article in 2007.
-$$
-	IC(term1,term2)=\frac{1}{p}
-$$
-where $p$ is the number of nodes on the shortest path between $term1$ and $term2$.
+This path-length measure is simple and proposed by Wu et al.\cite{k09_Wu} in 1994, it is defined as follows:
+\begin{equation}\label{eq:path}
+ Sim_{path}\left(t_1,t_2\right) = \frac{1}{p}
+\end{equation}
+where $p$ is the number of nodes on the shortest path between two terms in a DAG ontology.
+
+
 \subsection{lch}
-	This method is also not IC based and first proposed by Leacock C\cite{k10_Leacock} in 1998 and  mentiond in Pedersen's\cite{Pedersen2007288} article in 2007.
-$$
-	IC(term1,term2)=-\log(\frac{p}{2*depth})
-$$
-where $p$ is the number of nodes on the shortest path between $term1$ and $term2$ and $depth$ is 
-the maximum depth of the hierarchy.
+The Leacock and Chodorow measure (lch) \cite{k10_Leacock} is computed as 
+\begin{equation}\label{eq:lch}
+ Sim_{lch}\left(t_1,t_2\right) = -\log\left(\frac{p}{2*depth}\right)
+\end{equation}
+where $p$ is the number of nodes on the shortest path between two terms in a DAG ontology and $depth$ is the maximum depth of the hierarchy.
+
 
 \subsection{Wang}
-	Proposed by Wang\cite{k11_wang} in 2007 and see the original paper for detail.
-$$
-	Sim(term1,term2)=\frac{\sum\limits_{t\in T_{term1}\cap T_{term2}} (S_{term1}(t)+S_{term2}(t))}{SV(term1)+SV(term2)}
-$$
-where $S_{term1}(t)$ is the $S-value$ of term $t$ related to term $term1$. In DO, term $term1$ can be represented
-as $DAG_{term1}=(term1,T_{term1},E_{term1})$ where $T_{term1}$ is the set of DO terms in $DAG_{term1}$,including term
-$term1$ and all of its ancestor terms in the DO graph,and $E_{term1}$ is the set of edeges connecting the DO terms
-in $DAG_{term1}$.And for any term $t$ in $DAG_{term1}=(term1,T_{term1},E_{term1})$,its S-value is defined as:
-$$
-\left\{_{S_{term1}(t)=\max\{w_{e}*S_{term1}(t^{'})|t^{'} \in childrenof(t)\} \quad if \ t\neq A}^{S_{term1}(term1)=1}\right.
-$$
-where $w_{e}$ is the semantic contribution factor for edge $e \in E_{term1}$ linking term $t$ with its child term $t^{'}$.After
-obtaining the S-values for all terms in $DAG_{term1}$, we calculate the semantic value of DO term $term1$,$SV(term1)$,as:
-$$
-	SV(term1)=\sum\limits_{t\in T_{term1}}S_{term1}(t)
-$$
+In Wang's measure, each edge is given a weight according to the type of relationship \cite{k11_wang}. For term $A$, it can be represented as $DAG_A =(A,T_A,E_A)$ where $T_A$ is the set of all ancestor terms of A including A itself and $E_A$ is the set of edges connecting the terms in $DAG_A$. For any term $t$ in $DAG_A$, Wang et al. defines the semantic contribution of $t$ to $A$ as the product of all edge weights in the "best" path from $t$ to $A$, where the "best" path is the one that maximizes the product. It can be calculated by
+\begin{equation}\label{eq:wang1}
+ \left\{ \begin{array}{ll}
+          S_A\left(A\right)=1 \\
+	  S_A\left(t\right)=\max \left\{w_e \times S_A\left(t^{'}\right) \mid t^{'} \in childrenof\left(t\right) \right\} \quad if \  t\neq A
+         \end{array} \right.
+\end{equation}
+where $w_e$ is the semantic contribution factor of edge $e \in E_A$. The senmantic similarity between two terms is then calculated by summing the semantic contibutions of all common ancestors to each of the terms and diving by the total semantic contribution of each term's ancestors to that term which can be calculated by
+\begin{equation}\label{eq:wang2}
+ Sim_{Wang}\left(A,B\right) = \frac{\sum\limits_{t \in T_A \cap T_B}\left(S_A\left(t\right)+S_B\left(t\right)\right)}{SV\left(A\right)+SV\left(B\right)}
+\end{equation}
+where $SV\left(A\right)$ is the total semantic contribution to term $A$ in $DAG_A$, which is calculated by
+\begin{equation}\label{eq:sv}
+ SV\left(A\right) = \sum\limits_{t \in T_A} S_A\left(t\right)
+\end{equation}
+
+
 
 \section{Calculate Genes Similarity}
-Genes similarity is calculate based on their annotated DO terms similarity.\Rpackage{DOSim} provides users a function named
-\textsl{getGeneSim} to calculate genes similarity.It provides 8 methods to calculate genes similarity.A basic example is shown
+Genes similarity is calculated based on their complete DO annotation.  Each gene is represented by its set of direct annotations and semantic similarity is calculated between terms in one set and terms in the other (using one of the approaches defined above). \Rpackage{DOSim} provides users a function named \textsl{getGeneSim} to calculate genes similarity. It provides 8 methods to calculate genes similarity. A basic example is shown
 below:
 <<results=hide>>=
 genelist<-c("10003","10008","10015","10042","10036")
-gsim<-getGeneSim(genelist,similarity="funSimMax",similarityTerm="Lin")
+gsim<-getGeneSim(genelist,similarity="max",similarityTerm="Lin")
 @
 
 <<>>=
 gsim
 @
 
-Here we define some formula and detail information for each method is described below.
-Assume $gene1$ have $m$ DO annoated($DO_1=\{do_{11},do_{12},\dots,do_{1m}\}$) and $gene2$ have $n$ DO annotated($DO_2=\{do_{21},do_{22},\dots,do_{2n}\}$).
-We define $Sim_{matrix}$ is an $m\times n$ matrix of any pairwise DO terms similarity from $DO_1$ to $DO_2$.
-$$
-	Sim_{matrix}=
-\left\lbrace
-\begin{array}{clcr}
-	sim_{11} & sim_{12} & \cdots & sim_{1n} \\
-	sim_{21} & sim_{22} & \cdots & sim_{2n} \\
-	\multicolumn{4}{c}\dotfill \\
-	sim_{m1} & sim_{m2} & \cdots & sim_{mn}
-\end{array}
-\right\rbrace 
-$$
-\subsection{max}
+Detailed information for each method is described below:
 
-The maximum similarity between any two DO terms.
-$$
-	Sim(gene1,gene2)=\max(Sim_{matrix})
-$$
+\subsection{max}
+This method is straight forward. Given two genes $g$ and $g^{'}$ annotated with DO terms $t_1,\dots,t_n$ and $t_{1}^{'},\dots,t_{m}^{'}$, the functional similarity between two genes $g$ and $g^{'}$ is defined as follows:
+\begin{equation}\label{eq:max}
+ Sim_{max}\left(g,g^{'}\right) = \max\limits_{\begin{array}{ll}
+i=1,\dots,n \\
+j=1,\dots,m
+\end{array}
+} sim\left(t_i,t_{j}^{'}\right)
+\end{equation}
+
 
 \subsection{mean}
-The average similarity between any two DO terms
-$$
-	Sim(gene1,gene2)=mean(Sim_{matrix})
-$$
+It is similar to max method just by taking averaging the pairwise DO term similarity here and it is defined as follows:
+\begin{equation}\label{eq:mean}
+ Sim_{mean}\left(g,g^{'}\right) = \frac{\sum\limits_{\begin{array}{ll}
+i=1,\dots,n \\
+j=1,\dots,m
+\end{array}
+} sim\left(t_i,t_{j}^{'}\right)
+}{m \times n}
+\end{equation}
+
 \subsection{funSimMax}
-The average of best matching DO term similarities. 
-Take the maximum of the scores achieved by assignments of DO terms from gene 1 to gene 2 and vice versa.\cite{k12_Schlicker}
-$$
-	Sim(gene1,gene2)=\max(rowMax, colMax)
-$$
-where $rowMax$ is the average score of each row's maximum score, and same for $colMax$.
+This method is proposed by Schlicker et.al\cite{k06_Schlicker} using the best pairs technique. Given two genes $g$ and $g^{'}$ annotated with DO terms $t_1,\dots,t_n$ and $t_{1}^{'},\dots,t_{m}^{'}$, a similarity matrix $S$ is calculated with any of the methods for DO terms mentioned above ($S$ is a $n \times m$ matrix). The rows and columns of $S$ represent two different directional comparisons, row vetors correspond to a comparison of $g$ to $g^{'}$ and column vectors of $g^{'}$ to $g$. Simlarity values for the comparison of $g$ to $g^{'}$ ($rowScore$) and the comparison of $g^{'}$ to $g$ ($columnScore$) are defined as follows:
+\begin{equation}\label{eq:rowScrore}
+rowScore=\frac{1}{n}\sum\limits_{i=1}^{n} \max\limits_{1 \leq j \leq m} s_{ij}
+\end{equation}
+\begin{equation}\label{eq:columnScore}
+columnscore=\frac{1}{m}\sum\limits_{j=1}^{m} \max\limits_{1 \leq i \leq n} s_{ij}
+\end{equation}
+Method \textsl{funSimMax} takes the maximum value between $rowScore$ and $columnScore$ as the similarity value for genes $g$ and $g^{'}$, which can be calculated as follows:
+\begin{equation}\label{eq:funSimMax}
+ Sim_{funSimMax}\left(g,g^{'}\right) = \max\{ rowScore,columnScore\}
+\end{equation}
+
+
 
 \subsection{funSimAvg}
-The average of best matching DO term similarities. 
-Take the average of the scores achieved by assignments of DO terms from gene 1 to gene 2 and vice versa. \cite{k12_Schlicker}
-$$
-	Sim(gene1,gene2)=\frac{rowMax+colMax}{2}
-$$
-where $rowMax$ is the average score of each row's maximum score, and same for $colMax$.
-
+This method is similar to \textsl{funSimMax} just by taking the average value between $rowScore$ and $columnScore$ instead of taking the maximum value\cite{k06_Schlicker}. It is defined as follows:
+\begin{equation}\label{eq:funSimAvg}
+  Sim_{funSimAvg}\left(g,g^{'}\right) = \frac{rowScore+columnScore}{2}
+\end{equation}
 
 \subsection{OA}
-The optimal assignment (maximally weighted bipartite
-  matching) of DO terms associated to the gene having fewer annotation
-  to the DO terms of the other gene.\cite{k13_Froehlich}. See the original paper
-  for details.
+OA stands for optimal assignment, it means assigning each term of the gene having fewer DO terms to exactly one term of the other gene such that the overal similarity is maximized \cite{k00_GOSim,k13_Froehlich}. It can be state as follows: let $\pi$ be some permutation of either an $n$-subset of natural numbers $\{1,\dots,m\}$ or a $m$-subset of natural numbers $\{1,\dots,n\}$, then we are looking for the quantity:
+\begin{equation}\label{eq:OA}
+	Sim_{OA}\left(g,g^{'}\right) = \left\{
+\begin{array}{ll}
+\max_{\pi} \sum_{i=1}^{n} sim\left(t_i,t_{\pi\left(i\right)}^{'}\right) \quad if \ m \le n \\
+\max_{\pi} \sum_{j=1}^{m} sim\left(t_{\pi\left(j\right)},t_{j}^{'}\right) \quad otherwise
+\end{array}
+\right.
+\end{equation}
+where $sim\left(t_i,t_{\pi\left(i\right)}^{'}\right)$ and $sim\left(t_{\pi\left(j\right)},t_{j}^{'}\right)$ are any of the similarity methods for DO terms mentioned above.
+
   
 \subsection{hausdorff}
-The translation of the Hausdorff distance between two sets:\cite{k14_Pozo}
-Let A and B be the two sets of DO terms associated to two genes($gene1$ and $gene2$). 
-Then
-$$
-	Sim(gene1,gene2)=\min
-	\left( 
-		\min
-			\left(
-				\max_{x \in A}
-					\left(
-						x,y
-					\right)
-			\right),
-		\min
-			\left(
-				\max_{y \in B}
-					\left(
-						x,y
-					\right)
-			\right)	
-	\right)
-$$
+Here we apply the Hausdorff Distance (inverse of similarity) to calculated functional similarity between two genes from their set of DO terms \cite{k14_Pozo}. Hausdorff Distance is defined as the maximum value between any point within one set ($A$) and the nearest point in the other set ($B$). Hausdorff Distance from set A to B is defined as follows:
+\begin{equation}\label{eq:hausdorff1}
+Dist_{hausdorff}^{a \rightarrow b} = \max\limits_{a \in A} \left\{ \min\limits_{b \in B} \left(Dist\left(a,b\right)\right)\right\}
+\end{equation} where $Dist\left(a,b\right)$ is the distance metric betwee term $a$ and $b$. Then we defined the Hausdorff Distance between set A to B as follows:
+\begin{equation}\label{eq:hausdorff2}
+Dist_{hausdorff} = \max\left(Dist_{hausdorff}^{a \rightarrow b},Dist_{hausdorff}^{b \rightarrow a}   \right)
+\end{equation}
+
+Given two genes $g$ and $g^{'}$ with their set of DO terms $A$ and $B$ respectively, together with the simimarity matrix $S$, we defined the similarity between genes $g$ and $g^{'}$ using the Hausdorff Distance method based on the similarity matrix $S$ as follows:
+\begin{equation}\label{eq:hausdorff}
+Sim_{hausdorff}\left(g,g^{'}\right) = \min \left(Sim_{hausdorff}^{a \rightarrow b}\left(g,g^{'}\right) ,Sim_{hausdorff}^{b \rightarrow a}\left(g,g^{'}\right)  \right)
+\end{equation}
+where $Sim_{hausdorff}^{a \rightarrow b}\left(g,g^{'}\right)$ is the hausdorff similarity from set A to B and it is formulated as:
+\begin{equation}
+Sim_{hausdorff}^{a \rightarrow b}\left(g,g^{'}\right)=\min\limits_{a \in A} \left\{ \max\limits_{b \in B} \left(Sim\left(a,b\right)\right)\right\}
+\end{equation}
 
 \subsection{dot}
-The dot product between feature vectors describing the absence/presence of each DO term. 
-The absence of each DO term is weighted by its information content. 
-Depending on the type of later normalization one can arrive at the cosine similarity (method="sqrt")
-or at the Tanimoto coefficient (method="Tanimoto").\cite{k15_Mistry}.See the original paper
-  for details.
-
-
+First, for each gene $g$, we construct a feature vector $\phi(g)$ relative to a set of prototype genes $p = (p_1,\dots,p_n)$ which is defined as:
+\begin{equation}\label{eq:feature}
+\phi\left(g\right) = \left(sim_{max}\left(g,p_1\right),\dots,sim_{max}\left(g,p_n\right)\right)^{T}
+\end{equation}
+Then the similarity between genes $g$ and $g^{'}$ is the dot product of their feature vector defined by equation \ref{eq:feature} after normalizing which can be formulated as:
+\begin{equation}
+Sim_{dot}\left(g,g^{'}\right) = \frac{<\phi\left(g\right),\phi(g^{'})>}{\sqrt{<\phi\left(g\right),\phi(g)> \times <\phi\left(g^{'}\right),\phi(g^{'})>}} 
+\end{equation}
 
 \subsection{Wang}
-Propose by Wang in 2007.\cite{k11_wang}.
-Give two genes $gene1$ and $gene2$ annotated by DO term sets
-$DO_1=\{do_{11},do_{12},\dots,do_{1m}\}$ and $DO_2=\{do_{21},do_{22},\dots,do_{2n}\}$ respectively, we define their similarity as:
+It is proposed by Wang et.al \cite{k11_wang} used a best-match (best pairs technique) average combination strategy. Given two genes $g$ and $g^{'}$ annotated with DO terms $t_1,\dots,t_n$ ($DO_1$) and $t_{1}^{'},\dots,t_{m}^{'}$ ($DO_2$), we will find it is quite like the method \textsl{funSimAvg} as it is defined as follows:
+\begin{equation}\label{eq:simwang}
+ Sim_{wang}\left(g,g^{'}\right) = \frac{\sum\limits_{1 \leq i \leq n}Sim\left(t_i,DO_2\right) + \sum\limits_{1 \leq j \leq m}Sim\left(t_j^{'},DO_1\right)}{n+m}
+\end{equation}
+where $Sim\left(t_i,DO_2\right)$ and $Sim\left(t_j^{'},DO_1\right)$ are defined as:
 $$
-	Sim(gene1,gene2)=\frac{\sum\limits_{1\le i \le m}Sim(do_{1i},DO_2)+\sum\limits_{1\le j \le n}Sim(do_{2j},DO_1)}{m+n}
+\begin{array}{ll}
+  Sim(t_i,DO_2) = \max\limits_{1 \leq j \leq m} s_{ij} \\
+   Sim(t_j^{'},DO_1) = \max\limits_{1 \leq i \leq n} s_{ij}	
+\end{array}
 $$
-where $Sim(do_{1i},DO_2)=\max\limits_{do_j \in DO_2}(sim(do_{1i},do_j))$
+
 
 \section{Get Information of Disease Ontology}
-	The Disease Ontology is a community driven,open source ontology that is designed to
-link disparate datasets through disease concepts. Terms in DO are organized in Directed Acyclic Graph (DAG).
-With the work of John D.Osborne in 2009\cite{Osborne}, human genes are annotated to DO terms.In \Rpackage{DOSim}, we
-provide 7 functions to fetch information of DO terms. They are:
+The Disease Ontology is a community driven,open source ontology that is designed to link disparate datasets through disease concepts. Terms in DO are organized in Directed Acyclic Graph (DAG). With the work of John D.Osborne in 2009\cite{Osborne}, human genes are annotated to DO terms. In \Rpackage{DOSim}, we provide 7 functions to fetch information of DO terms. They are:
 \begin{itemize}
 \item	$getParents$
 \item	$getAncestors$
@@ -290,7 +344,7 @@ provide 7 functions to fetch information of DO terms. They are:
 \item	$getDoAnno$
 \item	$getDOGraph$
 \end{itemize}
-Basic example of each of the 7 functions are show in the following sections below.
+Basic examples of each of the 7 functions are show in the following sections below:
 \subsection{getParents}
 Returns a list of all direct parents associated to each DO term.
 <<>>=
@@ -327,7 +381,7 @@ getDoTerm(terms)
 \subsection{getDoAnno}
 Get gene list associated to each DO term
 <<>>=
-terms<-c("DOID:934","DOID:1579")
+terms<-c("DOID:1579")
 getDoAnno(terms)
 @
 
@@ -346,7 +400,7 @@ if(require(graph)){
 
 \section{DO Enrichment Analysis}
 \Rpackage{DOSim} can do DO enrichment analysis for a list of Entrez gene ids by using \textbf{hyper geometric test} 
-or \textbf{fisher test}.To do it, you can simply invoke the function $DOEnrichment$. Here is an example.
+or \textbf{fisher test}. To do it, you can simply invoke the function $DOEnrichment$. Here is an example.
 <<>>=
 genelist=as.character(1:100)
 DOEnrichment(genelist,method = "hypertest",filter=50,cutoff=0.001)
