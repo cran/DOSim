@@ -31,6 +31,6 @@
 \value{
  	various
 }
-\author{ Jiang Li </email{riverlee2008@gmail.com}> }
+\author{ Jiang Li <\email{riverlee2008@gmail.com}> }
 \keyword{file}
 

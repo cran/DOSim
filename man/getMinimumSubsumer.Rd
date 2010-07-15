@@ -31,15 +31,9 @@ getMinimumSubsumer(term1, term2)
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
 }
-\note{
-%%  ~~further notes~~
-}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 ###########################
 #Example

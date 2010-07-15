@@ -16,21 +16,15 @@ getDoTerm(dolist)
 character vector of DO IDs 
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 List with entry names for each DO ID. Each entry contains a character represents DOID's term name. 
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
 }
-\note{
-%%  ~~further notes~~
-}
+
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

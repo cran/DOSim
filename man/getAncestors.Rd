@@ -17,21 +17,15 @@ getAncestors(dolist, verbose = TRUE)
 	print out some information
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 	List with entry names for each DO ID. Each entry contains a charcter vector with the ancestor DO IDs
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
 }
-\note{
-%%  ~~further notes~~
-}
+
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 

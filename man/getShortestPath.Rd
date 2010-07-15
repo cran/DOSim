@@ -23,21 +23,15 @@ getShortestPath(term1, term2)
 \value{
 return the shortest path between two terms, if two term are not connect, the return value is Inf
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
 }
-\note{
-%%  ~~further notes~~
-}
+
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+
 \examples{
 ######################################
 #example

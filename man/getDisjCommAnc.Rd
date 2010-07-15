@@ -15,9 +15,7 @@ getDisjCommAnc(term1, term2)
   \item{term1}{ DO term 1 }
   \item{term2}{ DO term 2 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 Character vector of DO terms
 }
@@ -26,21 +24,14 @@ Character vector of DO terms
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
 }
-\note{
-%%  ~~further notes~~
-}
+
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+
 \examples{
 
-	if(require(graph))	
 	getDisjCommAnc("DOID:934","DOID:95")
-	
-	
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

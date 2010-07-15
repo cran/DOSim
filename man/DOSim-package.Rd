@@ -13,8 +13,8 @@ This package implements several functions useful for computing
 \tabular{ll}{
 Package: \tab DOSim\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2010-04-05\cr
+Version: \tab 1.2\cr
+Date: \tab 2010-7-15\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }
@@ -23,10 +23,10 @@ LazyLoad: \tab yes\cr
 \author{
 Jiang Li
 
-Maintainer: Jiang Li <\email{riverlee2008@gmail.com}>
+Maintainer: Jiang Li \email{riverlee2008@gmail.com}
 
 }
-\references{}
+
 
 \keyword{ package }
 \examples{

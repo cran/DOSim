@@ -27,26 +27,18 @@ plotCluster(hier, h = 0.9, minsize = 5, main = "Cluster Dendrogram", ...)
 \item{...}{
 }	other parameters
 }
-\details{	
-}
+
 \value{
 	show a picture with top part a cluster dendrogram and below is a barplot which the same color indicates a module defined by argument "h" and "minsize"
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
-}
-\note{
-%%  ~~further notes~~
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+
 \examples{
 	require(graphics)
 	hc <- hclust(dist(USArrests), "ave")

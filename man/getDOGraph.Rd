@@ -19,27 +19,19 @@ getDOGraph(term, prune = Inf)
 	do not show the complete graph, but prune it after the specified number of ancestors
 }
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
 graphNEL object(s)
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
+
 \author{
 Jiang Li<\email{riverlee2008@gmail.com}>
 }
-\note{
-%%  ~~further notes~~
-}
+
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+
 \examples{
 if(require(graph)){
 	g<-getDOGraph(c("DOID:95","DOID:8"))

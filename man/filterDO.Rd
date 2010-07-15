@@ -15,7 +15,7 @@ filterDO(genelist)
 }
 }
 \details{
-Filter out genes from a list not mapping to the disease ontology,and return a list which the genes are in the disease ontology.
+Filter out genes from a list not mapping to the disease ontology,and return a list which the genes have DO terms annotations in the disease ontology.
 }
 \value{
 List with items
@@ -24,14 +24,12 @@ List with items
 }
 
 \author{
-Jiang Li<\email{riverlee2008@gmail.com}>
+Jiang Li \email{riverlee2008@gmail.com}
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
+
 \examples{
 ################################
 #Example
