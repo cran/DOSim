@@ -38,7 +38,7 @@ Jiang Li<\email{riverlee2008@gmail.com}>
 	term1="DOID:8"
 	term2="DOID:5"
 	getShortestPath(term1,term2)
-	#return 1
+	
 	
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

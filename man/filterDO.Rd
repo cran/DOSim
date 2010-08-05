@@ -15,7 +15,7 @@ filterDO(genelist)
 }
 }
 \details{
-Filter out genes from a list not mapping to the disease ontology,and return a list which the genes have DO terms annotations in the disease ontology.
+Filter out genes from a list not mapping to the disease ontology,and return a list which the genes have DO term annotations in the disease ontology.
 }
 \value{
 List with items

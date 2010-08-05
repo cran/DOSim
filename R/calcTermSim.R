@@ -9,7 +9,7 @@ function(term1, term2, method="JiangConrath", verbose=TRUE){
 		if(an == "NA"){
 			return(0)
 		}else{
-		return(IC[an])   
+			return(IC[an])   
 		}
 	}	
 	else if(method == "JiangConrath"){
@@ -17,7 +17,7 @@ function(term1, term2, method="JiangConrath", verbose=TRUE){
 		if(an == "NA"){
 			return(0)	
 		}else{
-			return(1 - min(1, -2*IC[getMinimumSubsumer(term1,term2)] + IC[term1] + IC[term2]) )	
+			return(1 - min(1, -2*IC[an] + IC[term1] + IC[term2]) )	
 		}
 	}
 	else if(method == "Lin"){
@@ -25,12 +25,12 @@ function(term1, term2, method="JiangConrath", verbose=TRUE){
 		if(an == "NA"){
 			return(0)	
 		}else{
-			res = 2*IC[getMinimumSubsumer(term1,term2)]/(IC[term1]+IC[term2])
+			res = 2*IC[an]/(IC[term1]+IC[term2])
 			return(ifelse(is.na(res), 1, res))
 		}	
 	}
-	else if(method== "CoutoEnriched")
-		return(getEnrichedSim(term1, term2))
+	#else if(method== "CoutoEnriched")
+	#	return(getEnrichedSim(term1, term2))
 	else if(method == "CoutoResnik")  
 		return(getDisjCommAncSim(term1,term2, "Resnik"))
 	else if(method == "CoutoJiangConrath")  
@@ -58,13 +58,6 @@ function(term1, term2, method="JiangConrath", verbose=TRUE){
 			res = (2*IC[MICA]/(IC[term1]+IC[term2]))*(1 - exp(-IC[MICA]))
 			return(ifelse(is.na(res), 1, res))
 		}	
-	
-	}else if(method == "path"){
-		res=getSimPath(term1,term2);
-		return(res);
-	}else if(method == "lch"){
-		res=getSimLch(term1,term1)
-		return(res)
 	}else if(method == "Wang"){
 		res=getSimWang(term1,term2)
 		return(res)

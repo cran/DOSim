@@ -4,17 +4,17 @@
 \docType{package}
 \title{DOSim package}
 \description{
-This package implements several functions useful for computing
-	similarities between DO terms and gene products based on their DO annotation.
-	Moreover it allows for computing a DO enrichment analysis and provide basic
-	disease ontology annotation.
+This package implements multiple similarity measures for DO terms and gene products.
+	     It is aiming at disease analyis for gene sets. Modules of a gene set could be detected 
+	     and further multilayer annoated on DO, GO and KEGG. We also provides users to conduct DO enrichment
+	     analysis and basic information fetching for DO.
 }
 \details{
 \tabular{ll}{
 Package: \tab DOSim\cr
 Type: \tab Package\cr
-Version: \tab 1.2\cr
-Date: \tab 2010-7-15\cr
+Version: \tab 2.0\cr
+Date: \tab 2010-8-5\cr
 License: \tab GPL (>= 2)\cr
 LazyLoad: \tab yes\cr
 }

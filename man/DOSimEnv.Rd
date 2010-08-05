@@ -15,7 +15,7 @@ The original data is came from John D.Osborne's work.URL:\url{http://projects.bi
 
 \examples{
 data(DOSimEnv)
-## maybe str(DOSimEnv) ; plot(DOSimEnv) ...
+
 ls(DOSimEnv)
 }
 \keyword{datasets}

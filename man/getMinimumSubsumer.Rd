@@ -2,10 +2,10 @@
 \alias{getMinimumSubsumer}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Compute minimum subsumer of two DO terms
+Compute minimum subsumer (the most information common ancestor:MICA) of two DO terms
 }
 \description{
-Returns the minimum subsumer(i.e. the common ancestor having the
+Returns the minimum subsumer(the common ancestor having the
 maximal information content) of two DO terms 
 }
 \usage{

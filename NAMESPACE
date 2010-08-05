@@ -1,4 +1,3 @@
-useDynLib(DOSim,OAWrapper)
 export(getOffsprings,
 		getAncestors,
 		getParents,
@@ -12,6 +11,12 @@ export(getOffsprings,
 		getDisjCommAnc,
 		getTermSim,
 		DOEnrichment,
-		getGIC,
 		getShortestPath,
-		plotCluster)
+		detectModule,
+		viewModule,
+		saveModule,
+		annoModule,
+		saveAnnoModule,
+getDefaultBackground
+		
+		)
