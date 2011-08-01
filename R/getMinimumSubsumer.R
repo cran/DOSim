@@ -1,6 +1,6 @@
 getMinimumSubsumer <-
 function(term1, term2){	
-	if(!exists("DOSimEnv")) initialize()
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()
 	ancestor<-get("ancestor",envir=DOSimEnv)
 	#load("DOAncestor.rda")
 	if(term1 == term2){

@@ -8,7 +8,7 @@ function(dolist,verbose=TRUE){
 	if(verbose){
 		print("Start to fetch the ancestors")
 	}
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	ancestor<-get("ancestor",envir=DOSimEnv)
 	res<-ancestor[dolist[dolist %in% names(ancestor)]]
 	notmatch<-dolist[! dolist %in% names(ancestor)]

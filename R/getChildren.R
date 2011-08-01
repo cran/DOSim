@@ -8,7 +8,7 @@ function(dolist,verbose=TRUE){
 	if(verbose){
 		print("Start to fetch the children")
 	}
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	children<-get("children",envir=DOSimEnv)
 	res<-children[dolist[dolist %in% names(children)]]
 	notmatch<-dolist[! dolist %in% names(children)]

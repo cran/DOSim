@@ -2,7 +2,7 @@ getDOGraph <-
 function(term, prune=Inf){
 	if(!require(graph))
 		stop("Package graph is required for function getDOGraph")
-	if(!exists("DOSimEnv")) initialize()
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()
 	ENV_Child2Parent<-get("ENV_Child2Parent",envir=DOSimEnv);
 	
 	G<-DOGraph(term,ENV_Child2Parent)		

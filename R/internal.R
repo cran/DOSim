@@ -13,7 +13,7 @@
 #Journal:Bioinformatics
 #Formular:(sum(Sa(t)+Sb(t))/(SV(a)+SV(b))
 getSimWang<-function(term1,term2){
-	if(!exists("DOSimEnv")) initialize()
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()
 	
 	if(term1 == term2){
 		return(1);

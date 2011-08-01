@@ -1,5 +1,5 @@
 getDisjCommAncSim<-function(term1, term2, method="JiangConrath"){
-	if(!exists("DOSimEnv")) initialize()
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()
 	IC<-get("IC", envir=DOSimEnv)
 	djca<-getDisjCommAnc(term1, term2)	
 	ICdjca<-IC[djca]	

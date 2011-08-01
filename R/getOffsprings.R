@@ -8,7 +8,7 @@ function(dolist,verbose=TRUE){
 	if(verbose){
 		print("Start to fetch the offsprings")
 	}
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	offspring<-get("offspring",envir=DOSimEnv)
 	res<-offspring[dolist[dolist %in% names(offspring)]]
 	notmatch<-dolist[! dolist %in% names(offspring)]

@@ -1,7 +1,7 @@
 filterDO <-
 function(genelist){	
 	cat("filtering out genes not mapping to the currently Disease Ontology ...")
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	IC<-get("IC", envir=DOSimEnv)
 	ids<-names(IC[IC != Inf]) # only consider DO terms with some known annotation   
 	domap<-get("domap",env=DOSimEnv)

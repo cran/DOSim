@@ -5,7 +5,7 @@
 #		stop(paste("Unkown method",method,"for DOEnrichment"))
 #	
 #	
-#	if(!exists("DOSimEnv")) initialize()	
+#	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 #	if(is.list(genelist)){
 #		genelist<-unique(unlist(genelist));
 #	}else{
@@ -90,7 +90,7 @@
 #	if(!adjustp %in% p.adjust.methods)
 #		adjustp="fdr"           #as default
 #	
-#	if(!exists("DOSimEnv")) initialize()	
+#	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 #	if(is.list(genelist)){
 #		genelist<-unique(unlist(genelist));
 #	}else{
@@ -163,7 +163,7 @@
 #}
 
 getDefaultBackground<-function(){
-     if(!exists("DOSimEnv")) initialize()	
+     if(!exists("DOSimEnv")) initialize_DOSimEnv()	
      domap<-get("domap",envir=DOSimEnv)
       return(names(domap))
 }
@@ -175,7 +175,7 @@ function(genelist,filter=5,cutoff=0.05,layer=5,backgroud=getDefaultBackground())
 	#require(fdrtool)
 	#adjustp="fdr"           #as default
 	
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	if(is.list(genelist)){
 		genelist<-unique(unlist(genelist));
 	}else{

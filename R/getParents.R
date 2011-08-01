@@ -8,7 +8,7 @@ function(dolist,verbose=TRUE){
 	if(verbose){
 		print("Start to fetch the parents")
 	}
-	if(!exists("DOSimEnv")) initialize()
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()
 	ENV_Child2Parent<-get("ENV_Child2Parent",envir=DOSimEnv);
 	res<-mget(dolist,ENV_Child2Parent,ifnotfound=NA)
 	res

@@ -74,7 +74,7 @@ DOEnrichment(genelist,filter=5,cutoff=0.01,layer=NULL)
 \subsection{Measuring the similarity between human genes based on DO}
 In our package, we calculate the similarity between two genes based on the similarity of their DO term annotation groups (See section 3.1). Five different methods are implemented in \Rpackage{DOSim}, which are the arithmetic maxima and average of pairwise similarity between two groups of DO terms describing the two genes (max, mean) \cite{Lord}, the arithmetic maxima and average between similarities for two directional comparisons of the similarity matrix S of two genes (funSimMax, funSimAvg)\cite{k06_Schlicker}, and the best-match average approach (BMA) \cite{k11_wang}. 
 
-Let $DO_1$ and $DO_2$ be the groups of annotation terms for two genes $g_1$ and $g_2$, and $m$ and $n$ are the number of terms included in $DO_1$ and $DO_2$ respectively. A similarity matrix $S$ contains all pairwise similarity scores of mappings from $DO_1$ to $DO_2$ and vice verse with size $mxn$. '$rowScore$' and '$columnScore$' of $S$ are the averages over the row maxima and the column maxima, which give similarity scores for the comparison of $DO_1$ to $DO_2$ and the comparison of $DO_2$ to $DO_1$, respectively.
+Let $DO_1$ and $DO_2$ be the groups of annotation terms for two genes $g_1$ and $g_2$, and $m$ and $n$ are the number of terms included in $DO_1$ and $DO_2$ respectively. A similarity matrix $S$ contains all pairwise similarity scores of mappings from $DO_1$ to $DO_2$ and vice verse with size $m×n$. '$rowScore$' and '$columnScore$' of $S$ are the averages over the row maxima and the column maxima, which give similarity scores for the comparison of $DO_1$ to $DO_2$ and the comparison of $DO_2$ to $DO_1$, respectively.
 
 \begin{equation}\label{eq:rowScrore}
 rowScore=\frac{1}{m}\sum\limits_{i=1}^{m} \max\limits_{1 \leq j \leq n} s_{ij}
@@ -215,7 +215,7 @@ In Wang measure, each edge is given a weight according to the types of relations
 	  S_A\left(t\right)=\max \left\{w_e \times S_A\left(t^{'}\right) \mid t^{'} \in childrenof\left(t\right) \right\} \quad if \  t\neq A
          \end{array} \right.
 \end{equation}
-where $w_e$ is the semantic contribution factor of edge $e$ ($e \in E_A$). It is set between 0 and 1 according to the types of relationships, e.g., "is-a" or "part-of". In DO, there is only one type of relationships, defined as "is-a", and we set $w_e$ to 0.7 in \Rpackage{DOSim}. 
+where $w_e$ is the semantic contribution factor of edge $e$ ($e \in E_A$). It is set between 0 and 1 according to the types of relationships, e.g., “is-a” or “part-of”. In DO, there is only one type of relationships, defined as “is-a”, and we set $w_e$ to 0.7 in \Rpackage{DOSim}. 
 Then the semantic similarity between two terms $A$ and $B$ is calculated as follows: 
 \begin{equation}\label{eq:wang2}
  Sim_{Wang}\left(A,B\right) = \frac{\sum\limits_{t \in T_A \cap T_B}\left(S_A\left(t\right)+S_B\left(t\right)\right)}{SV\left(A\right)+SV\left(B\right)}

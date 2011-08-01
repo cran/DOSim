@@ -10,12 +10,15 @@
 \alias{getGSim}
 %\alias{getWeightedDotSim}
 \alias{precomputeTermSims}
-\alias{initialize}
+\alias{initialize_DOSimEnv}
 \alias{calcTermSim}
 \alias{normalize.kernel}
 \alias{getSimLch}
 \alias{getSimPath}
 \alias{getGIC}
+\alias{getSimWang}
+\alias{cutreeConstant}
+
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{  internal functions  }
 \description{

@@ -5,7 +5,7 @@ function(dolist){
 	}else{
 		dolist<-unique(dolist)
 	}
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	doanno<-get("doanno",envir=DOSimEnv)
 	res<-doanno[dolist[dolist %in% names(doanno)]]
 	notmatch<-dolist[! dolist %in% names(doanno)]

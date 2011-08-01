@@ -146,7 +146,7 @@ viewModule<-function(object,main="Hierarchical dendrogram and module colors",...
 	par(cex = 1.2);
 	#mar: c(bottom, left, top, right)
 	par(mar = c(0,4.5,2,1));
-	plot(dendro,labels=F,main=main, sub="", xlab="")
+	plot(dendro,labels=FALSE,main=main, sub="", xlab="")
 	par(mar = c(1,4.5,0,1));
 	
 	#invoke it by moduleColor      
@@ -216,7 +216,7 @@ annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,keg
 	}
 	
 	
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	
 	
 	result<-list();

@@ -6,7 +6,7 @@ function(term1,term2){
 	if(!require(RBGL))
 		stop("Package RBGL is required for function getShortestPath")
 		
-	if(!exists("DOSimEnv")) initialize()	
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()	
 	ancestor<-get("ancestor",envir=DOSimEnv)
 	an1<-unlist(ancestor[names(ancestor) == term1])
 	an2<-unlist(ancestor[names(ancestor) == term2])

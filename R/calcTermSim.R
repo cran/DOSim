@@ -1,6 +1,6 @@
 calcTermSim <-
 function(term1, term2, method="JiangConrath", verbose=TRUE){
-	if(!exists("DOSimEnv")) initialize()
+	if(!exists("DOSimEnv")) initialize_DOSimEnv()
 	IC<-get("IC", envir=DOSimEnv)
 	if(verbose)
 		print(paste("Terms:",term1,",",term2,"( method:",method,")"))	
