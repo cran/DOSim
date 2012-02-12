@@ -195,7 +195,7 @@ saveModule<-function(object,filename=NULL,sep="\t",iswriteout=TRUE){
 
 ######################################################
 #
-annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,keggcutoff=0.01,goontologoy="BP",calculateMeanSim=TRUE){
+annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,goontologoy="BP",calculateMeanSim=TRUE){
 	goontologoys=c("BP","CC","MF")
 	if(is.na(match(goontologoy,goontologoys))){
 		goontologoy="BP"
@@ -224,9 +224,6 @@ annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,keg
 		stop("package GOSim is needed")
 	}
 	
-	if(!require("SubpathwayMiner")){
-		stop("package SubpathwayMiner is needed")
-	}
 	setOntology(goontologoy)
 	#domap<-get("domap",envir=DOSimEnv)
 	gomap <- get("gomap",env=GOSimEnv)
@@ -247,21 +244,9 @@ annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,keg
 		subgenes<-module.data.frame$genes[module.data.frame$module==module.names[i]]
 		modulecolor<-as.character(unique(module.data.frame$color[module.data.frame$module==module.names[i]])[1])
 		doresult<-DOEnrichment(subgenes,filter=dofilter,cutoff=docutoff,layer=dolayer)
-		goresult<-GOenrichment(subgenes,allgenes,cutoff=1)
-		keggresult<-getAnn(subgenes)
-		#filter those q-value larger than cutoff for keggresult
-		keggindex=rep(FALSE,length(keggresult))
-		for(j in 1:length(keggresult)){
-			keggitem=keggresult[[j]]
-			if(keggitem$qvalue<keggcutoff){
-				keggindex[j]=TRUE
-			}
-		}
-		
-		keggresult<-keggresult[keggindex]
-		
-		
+				
 		doresult.data.frame<-data.frame("ID"=doresult$DOID,"Name"=doresult$Term,"pvalue"=doresult$pvalue,"qvalue"=doresult$qvalue)
+		goresult<-GOenrichment(subgenes,allgenes,cutoff=1)
 		#######################
 		#for goresult
 		gopvalue<-sort(goresult$p.values)
@@ -281,15 +266,7 @@ annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,keg
 			goresult.data.frame<-data.frame("ID"=character(),"Name"=character(),"pvalue"=numeric(),"qvalue"=numeric())
 		}	
 		
-		#######################
-		#for keggresult
-		if(length(keggresult)>0){
-			keggresult.data.frame<-data.frame("ID"=names(keggresult),"Name"=sapply(keggresult,function(a) a$pathwayName),"pvalue"=sapply(keggresult,function(a) a$pvalue),"qvalue"=sapply(keggresult,function(a) a$qvalue))
-		}else{
-			keggresult.data.frame<-data.frame("ID"=character(),"Name"=character(),"pvalue"=numeric(),"qvalue"=numeric())
-		}
-		
-		
+			
 		#####################################
 		#calculate the mean similarity of the module, and a t-test to all similarities
 		if(calculateMeanSim){
@@ -299,12 +276,12 @@ annoModule<-function(object,dofilter=5,dolayer=5,docutoff=0.01,gocutoff=0.01,keg
 				subsimlist=submatrix[upper.tri(submatrix)]
 				meansim=mean(submatrix)
 				pvalue=t.test(submatrix,allsim,method="greater")$p.value
-				sublist=list("DO"=doresult.data.frame,"GO"=goresult.data.frame,"KEGG"=keggresult.data.frame,"Genes"=subgenes,"Size"=length(subgenes),"ModuleColor"=modulecolor,"MeanSimilarity"=meansim,"pvalue"=pvalue)
+				sublist=list("DO"=doresult.data.frame,"GO"=goresult.data.frame,"Genes"=subgenes,"Size"=length(subgenes),"ModuleColor"=modulecolor,"MeanSimilarity"=meansim,"pvalue"=pvalue)
 			}else{
-				sublist=list("DO"=doresult.data.frame,"GO"=goresult.data.frame,"KEGG"=keggresult.data.frame,"Genes"=subgenes,"Size"=length(subgenes),"ModuleColor"=modulecolor)
+				sublist=list("DO"=doresult.data.frame,"GO"=goresult.data.frame,"Genes"=subgenes,"Size"=length(subgenes),"ModuleColor"=modulecolor)
 			}
 		}else{
-			sublist=list("DO"=doresult.data.frame,"GO"=goresult.data.frame,"KEGG"=keggresult.data.frame,"Genes"=subgenes,"Size"=length(subgenes),"ModuleColor"=modulecolor)
+			sublist=list("DO"=doresult.data.frame,"GO"=goresult.data.frame,"Genes"=subgenes,"Size"=length(subgenes),"ModuleColor"=modulecolor)
 		}
 		submodulename=paste("module_",module.names[i],sep="")
 		result[[submodulename]]<-sublist		
@@ -323,7 +300,6 @@ saveAnnoModule<-function(annotatedModule,filename=NULL,sep=","){
 	
 	if(is.na(charmatch("DO",names(annotatedModule[[1]]))) || 
 	   is.na(charmatch("GO",names(annotatedModule[[1]]))) ||
-	   is.na(charmatch("KEGG",names(annotatedModule[[1]]))) ||
 	   is.na(charmatch("Genes",names(annotatedModule[[1]]))) ||
 	   is.na(charmatch("Size",names(annotatedModule[[1]]))) ){
 	 	stop("annotatedModule is not a right list object, use function annoModule to get the result")
@@ -338,24 +314,23 @@ saveAnnoModule<-function(annotatedModule,filename=NULL,sep=","){
 	flag=0;
 	if(!is.na(charmatch("pvalue",names(annotatedModule[[1]])))){
 		flag=1;
-		head=paste("","","","","",'"Disease Ontology"',"","","",'"Gene Ontology"',"","","",'KEGG',"","","","Genes\n",sep=sep)
+		head=paste("","","","","",'"Disease Ontology"',"","","",'"Gene Ontology"',"","","","Genes\n",sep=sep)
 		cat(head,file=fhanlde)
-		head=paste('"Module Name"','"Module Color"','"Module Size"','Mean similarity','pvalue',"ID","Term","pvalue","qvalue","ID","Term","pvalue","qvalue","ID","Term","pvalue","qvalue","\n",sep=sep)
+		head=paste('"Module Name"','"Module Color"','"Module Size"','Mean similarity','pvalue',"ID","Term","pvalue","qvalue","ID","Term","pvalue","qvalue","\n",sep=sep)
 		cat(head,file=fhanlde)
 	}else{
-		head=paste("","","",'"Disease Ontology"',"","","",'"Gene Ontology"',"","","",'KEGG',"","","","Genes\n",sep=sep)
+		head=paste("","","",'"Disease Ontology"',"","","",'"Gene Ontology"',"","","","Genes\n",sep=sep)
 		cat(head,file=fhanlde)
-		head=paste('"Module Name"','"Module Color"','"Module Size"',"ID","Term","pvalue","qvalue","ID","Term","pvalue","qvalue","ID","Term","pvalue","qvalue","\n",sep=sep)
+		head=paste('"Module Name"','"Module Color"','"Module Size"',"ID","Term","pvalue","qvalue","ID","Term","pvalue","qvalue","\n",sep=sep)
 		cat(head,file=fhanlde)
 	}
 	
 	
 	for(i in 1:length(annotatedModule)){
-		maxlength=max(length(annotatedModule[[i]]$DO$ID),length(annotatedModule[[i]]$GO$ID),length(annotatedModule[[i]]$KEGG$ID),
+		maxlength=max(length(annotatedModule[[i]]$DO$ID),length(annotatedModule[[i]]$GO$ID),
 				length(annotatedModule[[i]]$Genes),1)
 		goframe=annotatedModule[[i]]$GO
 		doframe=annotatedModule[[i]]$DO		
-		keggframe=annotatedModule[[i]]$KEGG
 		genelist=annotatedModule[[i]]$Genes
 		for(j in 1:maxlength){
 			if(j==1){
@@ -384,12 +359,7 @@ saveAnnoModule<-function(annotatedModule,filename=NULL,sep=","){
 			}else{
 				head=paste(head,"","","","",sep=sep)
 			}
-			
-			if(j<=length(keggframe$ID)){
-				head=paste(head,keggframe[j,1],keggframe[j,2],keggframe[j,3],keggframe[j,4],sep=sep)
-			}else{
-				head=paste(head,"","","","",sep=sep)
-			}
+						
 			
 			if(j<=length(genelist)){
 				head=paste(head,genelist[j],sep=sep)

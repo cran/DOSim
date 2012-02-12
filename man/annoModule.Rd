@@ -6,7 +6,7 @@
 }
 \usage{
 annoModule(object,dofilter=5,dolayer=5,docutoff=0.01,
-	      gocutoff=0.01,keggcutoff=0.01,goontologoy="BP",
+	      gocutoff=0.01,goontologoy="BP",
 	      calculateMeanSim=TRUE)
 }
 \arguments{
@@ -15,12 +15,11 @@ annoModule(object,dofilter=5,dolayer=5,docutoff=0.01,
    \item{dolayer}{indicate that do terms beneath depth "dolayer" in the DAG of DO will be considered for analysis}
    \item{docutoff}{significant filter for do terms}
    \item{gocutoff}{significant filter for go terms}
-   \item{keggcutoff}{significant filter for kegg pathways}
    \item{goontologoy}{which category of GO is used when conducting analysis for the module result, value is one of "BP","MF",and "CC"}
    \item{calculateMeanSim}{whether to calculate the mean similariy for each module}   
 }
 \details{
-	The methodology for multilaper annotation is the enrichment analysis on DO, GO and KEGG.
+	The methodology for multilaper annotation is the enrichment analysis on DO and GO.
   }
 \value{
   return a list object with size equal to the module number. Each item in the list contains all the information for a certain module, and it
@@ -28,12 +27,11 @@ annoModule(object,dofilter=5,dolayer=5,docutoff=0.01,
   They are:
   1) DO, a data.frame object with four columns: ID, Name, pvalue and qvalue;
   2) GO, a data.frame object with four columns: ID, Name, pvalue and qvalue;
-  3) KEGG, a data.frame object with four columns: ID, Name, pvalue and qvalue;
-  4) Genes, a character vector of genes covered by the module;
-  5) Size, the size of the module, which is equal to the number of genes covered by the module;
-  6) ModuleColor, color stands for the module;
-  7) MeanSimilarity, the average gene similarity for the module (if parameter calculateMeanSim is set TRUE);
-  8) pvalue, t-test significant for comparison of gene similarity in the module with gene similarity in the gene list (if parameter calculateMeanSim is set TRUE).
+  3) Genes, a character vector of genes covered by the module;
+  4) Size, the size of the module, which is equal to the number of genes covered by the module;
+  5) ModuleColor, color stands for the module;
+  6) MeanSimilarity, the average gene similarity for the module (if parameter calculateMeanSim is set TRUE);
+  7) pvalue, t-test significant for comparison of gene similarity in the module with gene similarity in the gene list (if parameter calculateMeanSim is set TRUE).
   
 
 }
